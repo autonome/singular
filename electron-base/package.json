@@ -1,0 +1,24 @@
+{
+  "name": "Soundcloud",
+  "productName": "Soundcloud",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A minimal Electron application which loads a single URL:  https://translate.kagi.com https://soundcloud.com",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/automome/singular",
+  "keywords": [
+    "Electron",
+    "web",
+    "nativefier"
+  ],
+  "author": "autonome",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^34.2.0",
+    "electron-packager": "^17.1.2"
+  },
+  "url": "https://soundcloud.com"
+}

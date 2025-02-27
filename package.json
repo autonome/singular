@@ -1,0 +1,25 @@
+{
+  "name": "Singular",
+  "version": "1.0.0",
+  "description": "A minimal Electron application which generates and installs a minimal Electron application which loads a single URL.",
+  "type": "module",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "repository": "https://github.com/automome/singular",
+  "keywords": [
+    "Electron",
+    "web",
+    "nativefier"
+  ],
+  "author": "autonome",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^34.2.0",
+    "electron-packager": "^17.1.2"
+  },
+  "dependencies": {
+    "cross-zip": "^4.0.1"
+  }
+}

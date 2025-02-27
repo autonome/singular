@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+    <link href="./styles.css" rel="stylesheet">
+    <title>SINGULAR</title>
+  </head>
+  <body>
+    <div class="header">
+      <h1>SINGULAR</h1>
+      <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+    </div>
+
+    <div>
+      <p>Create a standalone native app for a website.</p>
+      <!--
+      <p>Proof of concept. Not intended for production use.</p>
+      -->
+    </div>
+
+    <form>
+      <div class="form-container">
+        <div class="form-row">
+          <label for="name">Name</label>
+          <input class="name" type="text" placeholder="Example" pattern="\w{2,50}" required/>
+        </div>
+        <div class="form-row">
+          <label for="url">URL</label>
+          <input class="url" type="url" placeholder="https://example.com" required/>
+        </div>
+        <div class="form-row">
+          <button class="generate">Generate</button>
+        </div>
+        <div>
+          <details>
+            <summary class="status">(I'm waiting for you to do something.)</summary>
+          </details>
+        </div>
+        <div>
+        </div>
+      </div>
+    </form>
+
+    <div class="footer">
+      Node.js <span id="node-version"></span>,
+      Chromium <span id="chrome-version"></span>,
+      Electron <span id="electron-version"></span>.
+    </div>
+
+    <!-- You can also require other files to run in this process -->
+    <script type=module src="./renderer.js"></script>
+  </body>
+</html>
