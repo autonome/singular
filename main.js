@@ -2,13 +2,13 @@
 import { app, BrowserWindow, dialog, ipcMain, session } from 'electron'
 import path from 'node:path'
 import process from 'node:process'
-import packager from 'electron-packager'
+import packager from '@electron/packager'
 import * as fs from 'fs';
 import zip from 'cross-zip';
 import { URL } from 'url';
 
 const JSON_FILE = './electron-base/package.json';
-const WIN_HEIGHT = 600;
+const WIN_HEIGHT = 500;
 const WIN_WIDTH = 600;
 
 // Disable asar, it breaks packaging
