@@ -1,9 +1,9 @@
 {
-  "name": "Soundcloud",
-  "productName": "Soundcloud",
+  "name": "",
+  "productName": "",
   "version": "1.0.0",
   "type": "module",
-  "description": "A minimal Electron application which loads a single URL:  https://translate.kagi.com https://soundcloud.com",
+  "description": "A minimal Electron application which loads a single URL: https://soundcloud.com ",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
@@ -17,8 +17,10 @@
   "author": "autonome",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^34.2.0",
-    "electron-packager": "^17.1.2"
+    "electron": "^34.2.0"
   },
-  "url": "https://soundcloud.com"
+  "url": "",
+  "dependencies": {
+    "@electron/packager": "^18.3.6"
+  }
 }

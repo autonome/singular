@@ -16,10 +16,10 @@
   "author": "autonome",
   "license": "MIT",
   "devDependencies": {
-    "electron": "^34.2.0",
-    "electron-packager": "^17.1.2"
+    "electron": "^34.2.0"
   },
   "dependencies": {
+    "@electron/packager": "^18.3.6",
     "cross-zip": "^4.0.1"
   }
 }

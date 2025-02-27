@@ -15,29 +15,8 @@ const WIN_WIDTH = 600;
 process.noAsar = true;
 
 // Could read this and write it back but why
-const packageJSON = {
-  "name": "",
-  "productName": "",
-  "version": "1.0.0",
-  "type": "module",
-  "description": "A minimal Electron application which loads a single URL: ",
-  "main": "main.js",
-  "scripts": {
-    "start": "electron ."
-  },
-  "repository": "https://github.com/automome/singular",
-  "keywords": [
-    "Electron",
-    "web",
-    "nativefier"
-  ],
-  "author": "autonome",
-  "license": "MIT",
-  "devDependencies": {
-    "electron": "^34.2.0",
-    "electron-packager": "^17.1.2"
-  }
-};
+// Oh, that's why
+const packageJSON = JSON.parse(fs.readFileSync(JSON_FILE, 'utf8'));
 
 const __dirname = import.meta.dirname
 
