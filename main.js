@@ -7,16 +7,11 @@ import * as fs from 'fs';
 import zip from 'cross-zip';
 import { URL } from 'url';
 
-const JSON_FILE = './electron-base/package.json';
 const WIN_HEIGHT = 500;
 const WIN_WIDTH = 600;
 
 // Disable asar, it breaks packaging
 process.noAsar = true;
-
-// Could read this and write it back but why
-// Oh, that's why
-const packageJSON = JSON.parse(fs.readFileSync(JSON_FILE, 'utf8'));
 
 const __dirname = import.meta.dirname
 
@@ -45,58 +40,69 @@ const validURL = str => {
   }
 };
 
-ipcMain.on('generate', async (e, msg) => {
-  // Convenience log to front-end
-  const mainWindow = BrowserWindow.getAllWindows()[0];
-  const felo = msg => mainWindow.webContents.send('log', msg );
+// front-end logger
+const felo = (type, text) =>
+  BrowserWindow.getAllWindows()[0]
+    .webContents.send(type, text );
 
-  const { name, url } = msg;
+const generate = async opts => {
+
+  const { name, url } = opts;
+  console.log('generating', name, url);
 
   // Validation on the front-end but give it a nod anyway
   if (!name || name.length < 2 || !url || !validURL(url)) {
     const errmsg = `Name or URL is bad`;
     console.error(errmsg);
-    e.reply('degenerate', { res: 'fail', text: errmsg });
+    felo('fail', errmsg);
     return;
   }
-  felo('Input validated');
+
+  felo('log', 'Input validated');
+
+  // Write app files to temp dir so they're cleaned up (eventually)
+  const tmpDir = app.getPath('temp');
+
+  // Copy base app to tmp dir and work from there
+  const srcAppDir = 'electron-base';
+  const appDir = path.join(tmpDir, `singular-${Date.now()}`);
+  fs.cpSync(srcAppDir, appDir, { recursive: true });
 
   // Update and write package.json
+  const jsonFile = path.join(appDir, 'package.json');
+  const packageJSON = JSON.parse(fs.readFileSync(jsonFile, 'utf8'));
+
   packageJSON.name = name;
   packageJSON.productName = name;
   packageJSON.description = `${packageJSON.description} ${url}`;
   packageJSON.url = url;
 
-  fs.writeFileSync(JSON_FILE, JSON.stringify(packageJSON, null, 2));
-  felo('Wrote new package.json. Packaging...');
+  fs.writeFileSync(jsonFile, JSON.stringify(packageJSON, null, 2));
 
-  // Write app files to temp dir so they're cleaned up (eventually)
-  const tmpDir = app.getPath('temp');
+  felo('log', 'Wrote new package.json. Packaging...');
 
-  // Writing zip file to this dir allows downloads to read from it
-  const userDataDir = app.getPath('userData');
-
-  const opts = {
-    dir: './electron-base/',
+  const pkgOpts = {
+    dir: appDir,
     name: name,
     overwrite: true,
     out: tmpDir
-  }
+  };
 
   let paths = null;
   try {
-    paths = await packager(opts)
-    felo('Packaged! Zipping...');
+    paths = await packager(pkgOpts)
   }
   catch (ex) {
     const errmsg = `Failed to package: ${ex}`;
     console.error(errmsg);
-    e.reply('degenerate', { res: 'fail', text: errmsg });
+    felo('fail', errmsg);
     return;
   }
 
+  felo('log', 'Packaged! Zipping...');
+
   const appPath = path.join(paths[0], `${name}.app`);
-  const zipPath = path.join(userDataDir, `${name}.zip`);
+  const zipPath = path.join(paths[0], `${name}.zip`);
 
   try {
     zip.zipSync(appPath, zipPath);
@@ -104,26 +110,27 @@ ipcMain.on('generate', async (e, msg) => {
   catch (ex) {
     const errmsg = `Failed to zip: ${ex}`;
     console.error(errmsg);
-    e.reply('degenerate', { res: 'fail', text: errmsg });
+    felo('fail', errmsg);
     return;
   }
 
-  felo('Zipped! Downloading...');
+  felo('log', 'Zipped! Downloading...');
 
   try {
     const zipURL = `file://${zipPath}`;
     session.defaultSession.downloadURL(zipURL);
-  } catch(ex) {
+  }
+  catch(ex) {
     const errmsg = `Failed to download: ${ex}`;
     console.error(errmsg);
-    e.reply('degenerate', { res: 'fail', text: errmsg });
+    felo('fail', errmsg);
     return;
   }
 
-  felo('Download initiated! Save this zip wherever you like. Open it to find your new app!');
+  felo('victory', 'Download initiated! Open the zip to find your new app!');
+};
 
-  e.reply('degenerate', { res: 'victory' });
-});
+ipcMain.on('generate', (e, msg) => generate(msg));
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.

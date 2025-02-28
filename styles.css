@@ -102,38 +102,13 @@ h1 {
  border: 0;
 }
 
-/*
-.input-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  padding-left: 0;
-}
-
-.input-row > div:nth-child(1) {
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  min-width: 5rem;
-  align-self: left;
-}
-
-.input-row > div:nth-child(2) input {
-  min-width: 15rem;
-}
-
-.button-row > div {
-  width: 20rem;
-}
-*/
-
+/* name / url */
 input {
   padding: 0.2rem;
 }
 
-.status {
+/* log */
+details, summary {
   font-size: small;
   font-style: italic;
 }
@@ -141,7 +116,6 @@ input {
 .footer {
   font-size: x-small;
 }
-
 
 .animating {
   animation: lds-grid 1.2s linear infinite;
@@ -152,7 +126,6 @@ input {
   box-sizing: border-box;
 }
 .lds-grid {
-  /*visibility: hidden;*/
   padding: 0;
   margin: 0;
   display: inline-block;

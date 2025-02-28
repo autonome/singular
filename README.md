@@ -31,7 +31,13 @@ In the zip file is the generated app. Install it in whatever way your OS require
 
 ## TODO
 
-- confirm multiple apps do/don't share data dir?
+build/deploy
+- set up local build
+- set up remote build
+- set up auto release
+
+future
+- look into auto-update of generated apps
 
 ## Thanks
 

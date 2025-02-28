@@ -1,10 +1,6 @@
 const { ipcRenderer } = require('electron');
 
-window.addEventListener('DOMContentLoaded', () => {
-  const replaceText = (selector, text) => {
-    const element = document.getElementById(selector)
-    if (element) element.innerText = text
-  }
+const init = () => {
 
   const log = str => {
     console.log('log', str);
@@ -20,40 +16,63 @@ window.addEventListener('DOMContentLoaded', () => {
     log(msg);
   });
 
-  for (const type of ['chrome', 'node', 'electron']) {
-    replaceText(`${type}-version`, process.versions[type])
-  }
-
-  const name = document.querySelector('.name');
-  const url = document.querySelector('.url');
-  const spinner = document.querySelector('.lds-grid');
+  const btn = document.querySelector('.generate');
   const form = document.querySelector('form');
 
-  form.addEventListener('submit', e => {
+  const toggleSpinner = () => {
+    document.querySelectorAll('.lds-grid > div')
+      .forEach(d => d.classList.toggle('animating'));
+  };
+
+  const onSubmit = () => {
     log('Here we go...');
-    document.querySelectorAll('.lds-grid > div').forEach(d => d.classList.toggle('animating'));
+    toggleSpinner();
+    btn.disabled = true;
 
     if (!form.checkValidity()) {
       form.reportValidity();
       log('The name or URL is bad, ok.');
+      toggleSpinner();
     }
     else {
-      log('Inputs are fine, generating...');
+      log('Inputs are valid, generating app...');
+
+      const url = document.querySelector('.url');
+      const name = document.querySelector('.name');
 
       ipcRenderer.send('generate', {
         name: name.value,
         url: url.value
       });
-
-      ipcRenderer.on('degenerate', (e, msg) => {
-        if (msg.res == 'victory' || msg.res == 'fail') {
-          document.querySelectorAll('.lds-grid > div').forEach(d => d.classList.toggle('animating'));
-        }
-      });
     }
+  };
 
+  form.addEventListener('submit', e => {
     e.preventDefault();
+    onSubmit();
   });
+
+  ipcRenderer.on('victory', (e, msg) => {
+    btn.disabled = false;
+    toggleSpinner();
+    log(msg);
+  });
+
+  ipcRenderer.on('fail', (e, msg) => {
+    btn.disabled = false;
+    toggleSpinner();
+    log(msg);
+  });
+
+  // Whatever
+  const replaceText = (selector, text) => {
+    const element = document.getElementById(selector);
+    if (element) element.innerText = text;
+  };
+
+  for (const type of ['chrome', 'node', 'electron']) {
+    replaceText(`${type}-version`, process.versions[type]);
+  }
 
   /*
   // Test
@@ -65,4 +84,6 @@ window.addEventListener('DOMContentLoaded', () => {
     log('Sent');
   }, 1000);
   */
-})
+};
+
+window.addEventListener('DOMContentLoaded', init);

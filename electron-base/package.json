@@ -1,9 +1,9 @@
 {
-  "name": "",
-  "productName": "",
+  "name": "example",
+  "productName": "example",
   "version": "1.0.0",
   "type": "module",
-  "description": "A minimal Electron application which loads a single URL: https://soundcloud.com ",
+  "description": "A minimal Electron application which loads a single URL: ",
   "main": "main.js",
   "scripts": {
     "start": "electron ."
@@ -19,7 +19,7 @@
   "devDependencies": {
     "electron": "^34.2.0"
   },
-  "url": "",
+  "url": "https://example.com",
   "dependencies": {
     "@electron/packager": "^18.3.6"
   }
