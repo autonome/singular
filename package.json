@@ -7,7 +7,7 @@
   "scripts": {
     "start": "electron ."
   },
-  "repository": "https://github.com/automome/singular",
+  "repository": "https://github.com/autonome/singular",
   "keywords": [
     "Electron",
     "web",
