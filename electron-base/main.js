@@ -1,8 +1,10 @@
 // Modules to control application life and create native browser window
-import { app, BrowserWindow } from 'electron'
-import path from 'node:path'
+import { app, BrowserWindow, Notification } from 'electron';
+import path from 'node:path';
+import process from 'node:process';
+import { execFileSync } from 'child_process';
 
-const __dirname = import.meta.dirname
+const __dirname = import.meta.dirname;
 
 import * as fs from 'fs';
 const str = fs.readFileSync(path.join(__dirname, 'package.json'), 'utf8');
@@ -44,6 +46,47 @@ app.whenReady().then(() => {
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 })
+
+const deleteMyself = () => {
+  console.log('Deleting myself');
+
+  const appPath = process.platform === 'win32'
+    ? path.resolve('.', 'singular.exe')
+    : process.execPath.replace(/\.app.*$/, '.app');
+  console.log('appPath', appPath);
+
+  const script = `tell application "Finder" 
+  move (application file of application process "fooble" as alias) to trash 
+end tell`;
+
+  const humanReadableOutput = true;
+  const outputArguments = humanReadableOutput ? [] : ['-ss'];
+	const stdout = execFileSync('osascript', ['-e', script, ...outputArguments], {
+		encoding: 'utf8',
+		stdio: ['ignore', 'pipe', 'ignore'],
+		timeout: 5000,
+	});
+  console.log('stdout', stdout.trim());
+
+  /*
+  //fs.unlinkSync(appPath, (err) => {
+  fs.unlink(appPath, (err) => {
+    if (err) {
+
+      new Notification({
+        title: 'ERROR',
+        body: err.message,
+      }).show();
+
+      console.error('Error removing app file:', err);
+    } else {
+      console.log('App file removed successfully');
+    }
+  });
+  */
+};
+
+//app.on('quit', deleteMyself);
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and require them here.
