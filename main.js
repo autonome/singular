@@ -16,12 +16,14 @@ process.noAsar = true;
 
 const __dirname = import.meta.dirname
 
+/*
 // if spawned copy for url opening, log to file so we can debug
 if (app.commandLine.hasSwitch('url2')) {
   const tempDir = app.getPath('temp');
   const access = fs.createWriteStream(path.join(tempDir, 'singular.log'));
   process.stdout.write = process.stderr.write = access.write.bind(access);
 }
+*/
 
 process.on('uncaughtException', function(err) {
   console.error((err && err.stack) ? err.stack : err);
@@ -199,34 +201,53 @@ const initTempProfile = () => {
   //console.log('sdp', sessionDataPath);
 };
 
-const openSelf = url => {
+const getAppPath = () => {
   const appName = 'singular';
   const appPath = process.platform === 'win32'
     ? path.resolve('.', `${appName}.exe`)
     : process.execPath.replace(/\.app.*$/, '.app');
-  console.log('appPath', appPath);
+  return appPath;
+};
 
-  //const cmd = appPath;
-  const cmd = 'electron';
+const openSelf = url => {
+  // running in dev or prod
+  const isPackaged = app.isPackaged;
+  console.log('isPackaged', isPackaged);
+
+  if (isPackaged) {
+    // we're running from a package
+    const appPath = getAppPath();
+    console.log('appPath', appPath);
+  }
+  else {
+    // we're running from source
+  }
+
+  //const cmd = 'electron';
+  const cmd = "electron-forge";
 
   const args = [
-    '.',
+    'start',
+    //'.',
     //path.join(process.cwd(), 'electron-base'),
+    '--',
     `--url2=${url}`
   ];
 
-  const cp = spawn(cmd, args, {
+  // start new process
+  const p2 = spawn(cmd, args, {
+    env: process.env,
+    // make the new process its own leader
     detached: true,
-    stdio:'ignore',
-    env: {
-      NODE_ENV: 'electron',
-      PATH: process.env.PATH
-    }
-  }).on('error', (err) => {
+    // DEBUG: send its output to the current terminal
+    //stdio: 'inherit',
+    stdio: 'ignore',
+  }).on('error', err => {
     console.error(err);
     process.exit(2);
   }).on('spawn', () => {
-    cp.unref();
+    // unref the process so we can exit
+    p2.unref();
     console.log('spawn complete, exiting process');
     process.exit(0);
   });

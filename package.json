@@ -5,7 +5,10 @@
   "type": "module",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "rawstart": "electron .",
+    "start": "electron-forge start",
+    "package": "electron-forge package",
+    "make": "electron-forge make"
   },
   "repository": "https://github.com/autonome/singular",
   "keywords": [
@@ -16,10 +19,12 @@
   "author": "autonome",
   "license": "MIT",
   "devDependencies": {
+    "@electron-forge/cli": "^7.8.1",
     "electron": "^34.2.0"
   },
   "dependencies": {
     "@electron/packager": "^18.3.6",
     "cross-zip": "^4.0.1"
-  }
+  },
+  "packageManager": "yarn@4.9.1"
 }
