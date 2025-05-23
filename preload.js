@@ -24,7 +24,15 @@ const init = () => {
       .forEach(d => d.classList.toggle('animating'));
   };
 
-  const onSubmit = () => {
+  const onOpen = () => {
+    log('Opening the app...');
+    const url = document.querySelector('.url');
+    ipcRenderer.send('open', {
+      url: url.value
+    });
+  };
+
+  const onGenerate = () => {
     log('Here we go...');
     toggleSpinner();
     btn.disabled = true;
@@ -49,7 +57,16 @@ const init = () => {
 
   form.addEventListener('submit', e => {
     e.preventDefault();
-    onSubmit();
+    // Did they click the open button or the generate button?
+    const clickedButton = e.submitter;
+    if (clickedButton.classList.contains('open')) {
+      log('Opening the app...');
+      onOpen();
+    }
+    else if (clickedButton.classList.contains('generate')) {
+      log('Generating the app...');
+      onGenerate();
+    }
   });
 
   ipcRenderer.on('victory', (e, msg) => {

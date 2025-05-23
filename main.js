@@ -29,7 +29,15 @@ process.on('uncaughtException', function(err) {
   console.error((err && err.stack) ? err.stack : err);
 });
 
-function createWindow() {
+const validURL = str => {
+  try {
+    return new URL(str);
+  } catch (err) {
+    return false;
+  }
+};
+
+function createAppWindow() {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: WIN_WIDTH,
@@ -46,7 +54,29 @@ function createWindow() {
   //mainWindow.webContents.openDevTools()
 }
 
+const openEphemeral = (url) => {
+  // spawn a new process to open the URL
+  openSelf(url);
+  console.log('self opened');
+
+  // exit this process
+  app.quit()
+  console.log('app quit');
+}
+
 function openURL(url) {
+  console.log('opening', url);
+
+  // Validation on the front-end but give it a nod anyway
+  if (!url || !validURL(url)) {
+    const errmsg = `URL is bad`;
+    console.error(errmsg);
+    felo('fail', errmsg);
+    return;
+  }
+
+  console.log('Input validated');
+
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 800,
@@ -63,21 +93,15 @@ function openURL(url) {
   // mainWindow.webContents.openDevTools()
 }
 
-const validURL = str => {
-  try {
-    return new URL(str);
-  } catch (err) {
-    return false;
-  }
-};
+ipcMain.on('open', (e, msg) => openEphemeral(msg.url));
 
 // front-end logger
 const felo = (type, text) =>
   BrowserWindow.getAllWindows()[0]
     .webContents.send(type, text );
 
+// Generate app package, zip it, and trigger download
 const generate = async opts => {
-
   const { name, url } = opts;
   console.log('generating', name, url);
 
@@ -166,8 +190,6 @@ ipcMain.on('generate', (e, msg) => generate(msg));
 const initTempProfile = () => {
   const PROFILE = `p${Date.now()}`;
 
-  console.log('PROFILE', PROFILE);
-
   // Profile dirs are subdir of userData dir
   // ..................................... ↓ we set this per profile
   //
@@ -179,26 +201,13 @@ const initTempProfile = () => {
   //
   // {home} / {appData} / {userData} / {profileDir} / {sessionData}
 
-
-  // specify various app data paths and make if not exist
   const appDataPath = app.getPath('appData');
   const userDataPath = app.getPath('userData');
-  //const profileDataPath = path.join(userDataPath, PROFILE);
-  //const sessionDataPath = path.join(profileDataPath, 'chromium');
-
-  console.log('adp', app.getPath('appData'));
-  console.log('udp', app.getPath('userData'));
 
   const tempDir = app.getPath('temp');
-  console.log('tempDir', tempDir);
 
   const tempAppDataPath = path.join(tempDir, PROFILE);
   app.setPath('appData', tempAppDataPath);
-
-  console.log('adp', app.getPath('appData'));
-  console.log('udp', app.getPath('userData'));
-  //console.log('pdp', profileDataPath);
-  //console.log('sdp', sessionDataPath);
 };
 
 const getAppPath = () => {
@@ -270,12 +279,7 @@ app.whenReady().then(() => {
       console.error('Bad URL');
     }
     else {
-      openSelf(url);
-      console.log('self opened');
-    
-      // exit
-      app.quit()
-      console.log('app quit');
+      openEphemeral(url);
     }
   }
   // We're a temporary spawn to open a URL
@@ -291,12 +295,12 @@ app.whenReady().then(() => {
   }
   // Window for generating and installing URL as app
   else {
-    createWindow();
+    createAppWindow();
 
     app.on('activate', function () {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
-      if (BrowserWindow.getAllWindows().length === 0) createWindow()
+      if (BrowserWindow.getAllWindows().length === 0) createAppWindow()
     });
   }
 });

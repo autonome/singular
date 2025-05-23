@@ -14,28 +14,27 @@
     </div>
 
     <div>
-      <p>Create a standalone native app for a website.</p>
-      <!--
+      <p>Open a website as an ephemeral app or install it as a standalone native app.</p>
       <p>Proof of concept. Not intended for production use.</p>
-      -->
     </div>
 
     <form>
       <div class="form-container">
         <div class="form-row">
           <label for="name">Name</label>
-          <input class="name" type="text" placeholder="Example" pattern="\w{2,50}" required/>
+          <input class="name" type="text" placeholder="Example" pattern="\w{2,50}">
         </div>
         <div class="form-row">
           <label for="url">URL</label>
-          <input class="url" type="url" placeholder="https://example.com" required/>
+          <input class="url" type="url" placeholder="https://example.com" required>
         </div>
         <div class="form-row">
-          <button class="generate">Generate</button>
+          <button class="open">Open as ephemeral app</button>
+          <button class="generate">Generate installable app</button>
         </div>
         <div>
           <details>
-            <summary class="status">(I'm waiting for you to do something.)</summary>
+            <summary class="status">(I'm the log. Do something and I'll show you what's happening!)</summary>
           </details>
         </div>
         <div>

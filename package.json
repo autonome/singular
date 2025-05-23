@@ -1,7 +1,7 @@
 {
   "name": "Singular",
   "version": "1.0.0",
-  "description": "A minimal Electron application which generates and installs a minimal Electron application which loads a single URL.",
+  "description": "A minimal Electron application which runs or installs a minimal Electron application which loads a single URL.",
   "type": "module",
   "main": "main.js",
   "scripts": {

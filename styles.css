@@ -107,6 +107,10 @@ input {
   padding: 0.2rem;
 }
 
+button {
+  margin-right: 0.2rem;
+}
+
 /* log */
 details, summary {
   font-size: small;
