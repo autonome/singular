@@ -62,6 +62,9 @@ In the zip file is the generated app. Install it as you would any app for your O
 
 Priority features
 - favicons -> app icons
+- back/forward navigation
+- refresh/reload
+- handle link clicks
 
 Build/deploy
 - local build

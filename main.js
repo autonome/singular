@@ -84,10 +84,10 @@ function openURL(url) {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
-  })
+  });
 
   // and load the URL of the website.
-  mainWindow.loadURL(url)
+  mainWindow.loadURL(url);
 
   // Open the DevTools.
   // mainWindow.webContents.openDevTools()
@@ -240,7 +240,9 @@ const openSelf = url => {
     //'.',
     //path.join(process.cwd(), 'electron-base'),
     '--',
-    `--url2=${url}`
+    `--url2=${url}`,
+    //'--enable-features=IsolatedWebApps,IsolatedWebAppDevMode,ControlledFrame,AutomaticFullscreenContentSetting,WebAppBorderless',
+    //'--install-isolated-web-app-from-url=http://localhost:5193'
   ];
 
   // start new process
