@@ -62,8 +62,16 @@ const createAppWindow = () => {
 };
 
 const openEphemeral = (url) => {
+  const args = [
+    `--url2=${url}`
+  ];
+
   // spawn a new process to open the URL
-  openSelf(url);
+  openSelf(args);
+
+  // exit this process
+  // TODO: make option, eg if a passthru cli call or whatever
+  //app.quit()
 };
 
 const openURL = (url) => {
@@ -203,32 +211,30 @@ const getAppPath = () => {
   return appPath;
 };
 
-const openSelf = url => {
+// Spawn a new instance of ourself
+const openSelf = addlArgs => {
   // running in dev or prod
   const isPackaged = app.isPackaged;
   console.log('isPackaged', isPackaged);
 
+  let cmd = 'electron-forge';
   if (isPackaged) {
     // we're running from a package
     const appPath = getAppPath();
-    console.log('appPath', appPath);
-  }
-  else {
-    // we're running from source
+    cmd = appPath;
   }
 
-  //const cmd = 'electron';
-  const cmd = "electron-forge";
+  console.log('cmd', cmd);
 
   const args = [
     'start',
     //'.',
     //path.join(process.cwd(), 'electron-base'),
     '--',
-    `--url2=${url}`,
+    //`--url2=${url}`,
     //'--enable-features=IsolatedWebApps,IsolatedWebAppDevMode,ControlledFrame,AutomaticFullscreenContentSetting,WebAppBorderless',
     //'--install-isolated-web-app-from-url=http://localhost:5193'
-  ];
+  ].concat(addlArgs);
 
   // start new process
   const p2 = spawn(cmd, args, {
@@ -242,10 +248,9 @@ const openSelf = url => {
     console.error(err);
     process.exit(2);
   }).on('spawn', () => {
-    // unref the process so we can exit
+    // unref the process so we are decoupled
     p2.unref();
-    console.log('spawn complete, exiting process');
-    process.exit(0);
+    console.log('spawn complete');
   });
 };
 
