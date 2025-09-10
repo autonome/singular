@@ -46,7 +46,7 @@ html,
 body {
 	margin: 0;
   padding: 0;
-  padding-top: 1rem;
+  padding-top: 1.5rem;
 	font-family: var(--font-family);
   color: var(--text);
 	background-color: var(--background);
@@ -83,6 +83,11 @@ h1, div {
 h1 {
   padding-top: 0;
   margin-top: 0;
+}
+
+.warning {
+  color: #FF00FF;
+  font-weight: bold;
 }
 
 .form-container {

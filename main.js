@@ -11,7 +11,7 @@ import { URL } from 'url';
 const appName = 'singular';
 
 const WIN_HEIGHT = 600;
-const WIN_WIDTH = 800;
+const WIN_WIDTH = 700;
 
 const DEFAULT_WEB_HEIGHT = 600;
 const DEFAULT_WEB_WIDTH = 800;
