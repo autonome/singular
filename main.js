@@ -212,7 +212,7 @@ const getAppPath = () => {
 };
 
 // Spawn a new instance of ourself
-const openSelf = addlArgs => {
+const openSelf = (addlArgs = []) => {
   // running in dev or prod
   const isPackaged = app.isPackaged;
   console.log('isPackaged', isPackaged);
@@ -228,12 +228,7 @@ const openSelf = addlArgs => {
 
   const args = [
     'start',
-    //'.',
-    //path.join(process.cwd(), 'electron-base'),
     '--',
-    //`--url2=${url}`,
-    //'--enable-features=IsolatedWebApps,IsolatedWebAppDevMode,ControlledFrame,AutomaticFullscreenContentSetting,WebAppBorderless',
-    //'--install-isolated-web-app-from-url=http://localhost:5193'
   ].concat(addlArgs);
 
   // start new process
@@ -245,15 +240,19 @@ const openSelf = addlArgs => {
     //stdio: 'inherit',
     stdio: 'ignore',
   }).on('error', err => {
-    console.error(err);
-    process.exit(2);
+    // TODO: should send this to front-end
+    console.error('could not spawn', err);
   }).on('spawn', () => {
     // unref the process so we are decoupled
     p2.unref();
+    // TODO: should send this to front-end
     console.log('spawn complete');
   });
 };
 
+// TODO: fix so it remembers if has been asked already
+// probably requires some local state
+// or maybe make a UI option to check/set
 const registerAsDefaultBrowser = () => {
   // Set Singular as default protocol handler for HTTP/HTTPS
   if (!app.commandLine.hasSwitch('url') && !app.commandLine.hasSwitch('url2')) {
