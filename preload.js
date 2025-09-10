@@ -65,7 +65,16 @@ const init = () => {
 
   form.addEventListener('submit', e => {
     e.preventDefault();
+
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      log('The name or URL is bad, ok.');
+      return;
+    }
+
+    // Inputs are good, let's roll
     timedSpinner(5000);
+
     // Did they click the open button or the generate button?
     const clickedButton = e.submitter;
     if (clickedButton.classList.contains('open')) {
@@ -84,14 +93,15 @@ const init = () => {
 
   ipcRenderer.on('victory', (e, msg) => {
     btn.disabled = false;
-    log('onPackageVictory', msg);
+    log('onVictory', msg);
   });
 
   ipcRenderer.on('fail', (e, msg) => {
     btn.disabled = false;
-    log('onPackageFail', msg);
+    log('onFail', msg);
   });
 
+  // Spin the spinner for a set period of ms
   const timedSpinner = (ms = 400) => {
     const animating =
       document.querySelector('.lds-grid > div').classList.contains('animating');
@@ -101,6 +111,7 @@ const init = () => {
     }
   }
 
+  // Spin the spinner when typing in inputs
   document.querySelectorAll('input').forEach(el => {
     el.addEventListener('keyup', () => {
       timedSpinner(400);

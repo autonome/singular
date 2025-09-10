@@ -10,8 +10,8 @@ import { URL } from 'url';
 
 const appName = 'singular';
 
-const WIN_HEIGHT = 500;
-const WIN_WIDTH = 600;
+const WIN_HEIGHT = 600;
+const WIN_WIDTH = 800;
 
 const DEFAULT_WEB_HEIGHT = 600;
 const DEFAULT_WEB_WIDTH = 800;
@@ -276,7 +276,7 @@ const registerAsDefaultBrowser = () => {
   }
 };
 
-registerAsDefaultBrowser();
+//registerAsDefaultBrowser();
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -292,6 +292,7 @@ app.whenReady().then(() => {
   }
   */
 
+  /*
   // We're initial process to open a URL
   if (app.commandLine.hasSwitch('url')) {
     console.log('url switch found');
@@ -306,8 +307,10 @@ app.whenReady().then(() => {
       openEphemeral(url);
     }
   }
+  else
+  */
   // We're a temporary spawn to open a URL
-  else if (app.commandLine.hasSwitch('url2')) {
+  if (app.commandLine.hasSwitch('url2')) {
     // If we're opening a temporary URL then we need to
     // create a temporary profile for the data
     initTempProfile();
@@ -315,7 +318,7 @@ app.whenReady().then(() => {
     const url = app.commandLine.getSwitchValue('url2');
     openURL(url);
   }
-  // Window for generating and installing URL as app
+  // Default app window
   else {
     createAppWindow();
 

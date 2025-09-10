@@ -44,18 +44,27 @@ html {
 
 html,
 body {
-  padding: 1rem;
 	margin: 0;
+  padding: 0;
+  padding-top: 1rem;
 	font-family: var(--font-family);
   color: var(--text);
 	background-color: var(--background);
 }
 
-div, h1 {
-  /*
-  border: solid 1px white;
-  */
+.container {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
+
+/*
+div, h1 {
+  border: solid 1px white;
+}
+*/
 
 .header {
   margin: 0;
@@ -77,6 +86,7 @@ h1 {
 }
 
 .form-container {
+  margin: 0;
   padding: 0;
   border-radius: 3px;
   max-width: 40rem;
@@ -115,6 +125,18 @@ button {
 }
 
 /* log */
+
+.log {
+  padding: 0.5rem;
+  margin: 0;
+  flex-grow: 2;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  background-color: var(--background);
+  color: var(--text);
+}
+
 details, summary {
   font-size: small;
   font-style: italic;
@@ -122,6 +144,7 @@ details, summary {
 
 .footer {
   font-size: x-small;
+  min-height: 1.5rem;
 }
 
 .animating {

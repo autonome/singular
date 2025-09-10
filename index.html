@@ -8,45 +8,51 @@
     <title>SINGULAR</title>
   </head>
   <body>
-    <div class="header">
-      <h1>SINGULAR</h1>
-      <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-    </div>
-
-    <div>
-      <p>Open a website as an ephemeral app or install it as a standalone native app.</p>
-      <p>Proof of concept. Not intended for production use.</p>
-    </div>
-
-    <form>
-      <div class="form-container">
-        <div class="form-row">
-          <label for="name">Name</label>
-          <input class="name" type="text" placeholder="Example" pattern="\w{2,50}">
-        </div>
-        <div class="form-row">
-          <label for="url">URL</label>
-          <input class="url" type="url" placeholder="https://example.com" required>
-        </div>
-        <div class="form-row buttons">
-          <button class="open">Open URL</button>
-          <button class="ephemeral">Open in ephemeral app</button>
-          <button class="generate">Download as packaged app</button>
-        </div>
-        <div>
-          <details>
-            <summary class="status">(I'm the log. Do something and I'll show you what's happening!)</summary>
-          </details>
-        </div>
-        <div>
-        </div>
+    <div class="container">
+      <div class="header">
+        <h1>SINGULAR</h1>
+        <div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
       </div>
-    </form>
 
-    <div class="footer">
-      Node.js <span id="node-version"></span>,
-      Chromium <span id="chrome-version"></span>,
-      Electron <span id="electron-version"></span>.
+      <div>
+        <p>Open a website...</p>
+        <ul>
+          <li>in standalone window</li>
+          <li>as an ephemeral app</li>
+          <li>or install it as a standalone native app</li>
+        </ul>
+        <p>Proof of concept. Not intended for production use.</p>
+      </div>
+
+      <div class="form-container">
+        <form>
+          <div class="form-row">
+            <label for="name">Name</label>
+            <input class="name" type="text" placeholder="Example" pattern="\w{2,50}">
+          </div>
+          <div class="form-row">
+            <label for="url">URL</label>
+            <input class="url" type="url" placeholder="https://example.com" required>
+          </div>
+          <div class="form-row buttons">
+            <button class="open">Open URL</button>
+            <button class="ephemeral">Open in ephemeral app</button>
+            <button class="generate">Download as packaged app</button>
+          </div>
+          <div class="log">
+            <details>
+              <summary class="status">(I'm the log. Do something and I'll show you what's happening!)</summary>
+            </details>
+          </div>
+        </form>
+      </div>
+
+      <div class="footer">
+        Node.js <span id="node-version"></span>,
+        Chromium <span id="chrome-version"></span>,
+        Electron <span id="electron-version"></span>.
+      </div>
+
     </div>
 
     <!-- You can also require other files to run in this process -->
