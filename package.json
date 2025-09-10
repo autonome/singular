@@ -25,6 +25,5 @@
   "dependencies": {
     "@electron/packager": "^18.3.6",
     "cross-zip": "^4.0.1"
-  },
-  "packageManager": "yarn@4.9.1"
+  }
 }

@@ -25,22 +25,30 @@ const init = () => {
   };
 
   const onOpen = () => {
-    log('Opening the app...');
+    log('Opening the URL...');
     const url = document.querySelector('.url');
     ipcRenderer.send('open', {
       url: url.value
     });
   };
 
+  const onEphemeral = () => {
+    log('Opening the URL in ephemeral app...');
+    toggleSpinner();
+    const url = document.querySelector('.url');
+    ipcRenderer.send('ephemeral', {
+      url: url.value
+    });
+    setTimeout(toggleSpinner, 5000);
+  };
+
   const onGenerate = () => {
     log('Here we go...');
-    toggleSpinner();
     btn.disabled = true;
 
     if (!form.checkValidity()) {
       form.reportValidity();
       log('The name or URL is bad, ok.');
-      toggleSpinner();
     }
     else {
       log('Inputs are valid, generating app...');
@@ -57,11 +65,16 @@ const init = () => {
 
   form.addEventListener('submit', e => {
     e.preventDefault();
+    timedSpinner(5000);
     // Did they click the open button or the generate button?
     const clickedButton = e.submitter;
     if (clickedButton.classList.contains('open')) {
       log('Opening the app...');
       onOpen();
+    }
+    else if (clickedButton.classList.contains('ephemeral')) {
+      log('Opening the app...');
+      onEphemeral();
     }
     else if (clickedButton.classList.contains('generate')) {
       log('Generating the app...');
@@ -71,14 +84,27 @@ const init = () => {
 
   ipcRenderer.on('victory', (e, msg) => {
     btn.disabled = false;
-    toggleSpinner();
-    log(msg);
+    log('onPackageVictory', msg);
   });
 
   ipcRenderer.on('fail', (e, msg) => {
     btn.disabled = false;
-    toggleSpinner();
-    log(msg);
+    log('onPackageFail', msg);
+  });
+
+  const timedSpinner = (ms = 400) => {
+    const animating =
+      document.querySelector('.lds-grid > div').classList.contains('animating');
+    if (!animating) {
+      toggleSpinner()
+      setTimeout(toggleSpinner, ms);
+    }
+  }
+
+  document.querySelectorAll('input').forEach(el => {
+    el.addEventListener('keyup', () => {
+      timedSpinner(400);
+    });
   });
 
   // Whatever

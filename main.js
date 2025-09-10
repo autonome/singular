@@ -8,8 +8,13 @@ import * as fs from 'fs';
 import zip from 'cross-zip';
 import { URL } from 'url';
 
+const appName = 'singular';
+
 const WIN_HEIGHT = 500;
 const WIN_WIDTH = 600;
+
+const DEFAULT_WEB_HEIGHT = 600;
+const DEFAULT_WEB_WIDTH = 800;
 
 // Disable asar, it breaks packaging
 process.noAsar = true;
@@ -29,6 +34,11 @@ process.on('uncaughtException', function(err) {
   console.error((err && err.stack) ? err.stack : err);
 });
 
+// front-end logger
+const felo = (type, text) =>
+  BrowserWindow.getAllWindows()[0]
+    .webContents.send(type, text );
+
 const validURL = str => {
   try {
     return new URL(str);
@@ -37,7 +47,7 @@ const validURL = str => {
   }
 };
 
-function createAppWindow() {
+const createAppWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: WIN_WIDTH,
@@ -49,24 +59,14 @@ function createAppWindow() {
 
   // and load the index.html of the app.
   mainWindow.loadFile('index.html')
-
-  // Open the DevTools.
-  //mainWindow.webContents.openDevTools()
-}
+};
 
 const openEphemeral = (url) => {
   // spawn a new process to open the URL
   openSelf(url);
-  console.log('self opened');
+};
 
-  // exit this process
-  app.quit()
-  console.log('app quit');
-}
-
-function openURL(url) {
-  console.log('opening', url);
-
+const openURL = (url) => {
   // Validation on the front-end but give it a nod anyway
   if (!url || !validURL(url)) {
     const errmsg = `URL is bad`;
@@ -75,12 +75,10 @@ function openURL(url) {
     return;
   }
 
-  console.log('Input validated');
-
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: DEFAULT_WEB_WIDTH,
+    height: DEFAULT_WEB_HEIGHT,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
@@ -88,17 +86,7 @@ function openURL(url) {
 
   // and load the URL of the website.
   mainWindow.loadURL(url);
-
-  // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
-}
-
-ipcMain.on('open', (e, msg) => openEphemeral(msg.url));
-
-// front-end logger
-const felo = (type, text) =>
-  BrowserWindow.getAllWindows()[0]
-    .webContents.send(type, text );
+};
 
 // Generate app package, zip it, and trigger download
 const generate = async opts => {
@@ -120,7 +108,7 @@ const generate = async opts => {
 
   // Copy base app to tmp dir and work from there
   const srcAppDir = 'electron-base';
-  const appDir = path.join(tmpDir, `singular-${Date.now()}`);
+  const appDir = path.join(tmpDir, `${appName}-${Date.now()}`);
   fs.cpSync(srcAppDir, appDir, { recursive: true });
 
   // Update and write package.json
@@ -185,8 +173,6 @@ const generate = async opts => {
   felo('victory', 'Download initiated! Open the zip to find your new app!');
 };
 
-ipcMain.on('generate', (e, msg) => generate(msg));
-
 const initTempProfile = () => {
   const PROFILE = `p${Date.now()}`;
 
@@ -211,7 +197,6 @@ const initTempProfile = () => {
 };
 
 const getAppPath = () => {
-  const appName = 'singular';
   const appPath = process.platform === 'win32'
     ? path.resolve('.', `${appName}.exe`)
     : process.execPath.replace(/\.app.*$/, '.app');
@@ -264,11 +249,44 @@ const openSelf = url => {
   });
 };
 
+const registerAsDefaultBrowser = () => {
+  // Set Singular as default protocol handler for HTTP/HTTPS
+  if (!app.commandLine.hasSwitch('url') && !app.commandLine.hasSwitch('url2')) {
+    // Windows/Linux
+    if (process.defaultApp) {
+      if (process.argv.length >= 2) {
+        const argv1Path = path.resolve(process.argv[1]);
+        const isDefault = app.isDefaultProtocolClient('http', process.execPath, [argv1Path])
+          && app.isDefaultProtocolClient('https', process.execPath, [argv1Path]);
+        if (!isDefault) {
+          app.setAsDefaultProtocolClient('http', process.execPath, [path.resolve(process.argv[1])]);
+          app.setAsDefaultProtocolClient('https', process.execPath, [path.resolve(process.argv[1])]);
+        }
+      }
+    }
+    // Mac
+    else if (!app.isDefaultProtocolClient('http') || !app.isDefaultProtocolClient('https')){
+      app.setAsDefaultProtocolClient('http');
+      app.setAsDefaultProtocolClient('https');
+    }
+  }
+};
+
+registerAsDefaultBrowser();
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  console.log('ready');
+  /*
+  // Check for protocol URL in argv (Windows/Linux)
+  const protocolUrl = process.argv.find(arg => arg.startsWith('http://') || arg.startsWith('https://'));
+  if (protocolUrl && !app.commandLine.hasSwitch('url') && !app.commandLine.hasSwitch('url2')) {
+    console.log('Found protocol URL in argv:', protocolUrl);
+    openURL(protocolUrl);
+    return;
+  }
+  */
 
   // We're initial process to open a URL
   if (app.commandLine.hasSwitch('url')) {
@@ -289,10 +307,8 @@ app.whenReady().then(() => {
     // If we're opening a temporary URL then we need to
     // create a temporary profile for the data
     initTempProfile();
-    console.log('temp profile created');
 
     const url = app.commandLine.getSwitchValue('url2');
-    console.log('url2', url);
     openURL(url);
   }
   // Window for generating and installing URL as app
@@ -307,10 +323,21 @@ app.whenReady().then(() => {
   }
 });
 
+app.on('open-url', (event, url) => {
+  // TODO: test if this is needed
+  //event.preventDefault();
+  openURL(url);
+});
+
+ipcMain.on('open', (e, msg) => openURL(msg.url));
+
+ipcMain.on('ephemeral', (e, msg) => openEphemeral(msg.url));
+
+ipcMain.on('generate', (e, msg) => generate(msg));
+
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') app.quit()
 });
-
