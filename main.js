@@ -206,8 +206,11 @@ const initTempProfile = () => {
 
 const getAppPath = () => {
   const appPath = process.platform === 'win32'
+    // windows
     ? path.resolve('.', `${appName}.exe`)
-    : process.execPath.replace(/\.app.*$/, '.app');
+    // mac / TODO: linux
+    : process.execPath;
+    //: process.execPath.replace(/\.app.*$/, '.app');
   return appPath;
 };
 
@@ -304,7 +307,7 @@ app.whenReady().then(() => {
       console.error('Bad URL');
     }
     else {
-      openEphemeral(url);
+      openURL(url);
     }
   }
   else
