@@ -79,7 +79,7 @@ In the zip file is the generated app. Install it as you would any app for your O
 ## Current status
 
 - DANGEROUS, no audits and missing all of the security UX of a full browser
-- Only tested on macOS
+- Developed and tested on macOS, with some testing on Linux but not much yet
 
 ## TODO
 
