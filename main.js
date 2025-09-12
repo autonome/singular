@@ -50,11 +50,9 @@ const validURL = str => {
 const createAppWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: WIN_WIDTH,
+    autoHideMenuBar: true,
     height: WIN_HEIGHT,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    }
+    width: WIN_WIDTH,
   })
 
   // and load the index.html of the app.
@@ -84,16 +82,17 @@ const openURL = (url) => {
   }
 
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
-    width: DEFAULT_WEB_WIDTH,
+  const win = new BrowserWindow({
+    autoHideMenuBar: true,
     height: DEFAULT_WEB_HEIGHT,
+    width: DEFAULT_WEB_WIDTH,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     }
   });
 
   // and load the URL of the website.
-  mainWindow.loadURL(url);
+  win.loadURL(url);
 };
 
 // Generate app package, zip it, and trigger download
