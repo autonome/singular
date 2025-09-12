@@ -53,6 +53,9 @@ const createAppWindow = () => {
     autoHideMenuBar: true,
     height: WIN_HEIGHT,
     width: WIN_WIDTH,
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js')
+    }
   })
 
   // and load the index.html of the app.
