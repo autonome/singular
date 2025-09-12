@@ -64,35 +64,38 @@ const createAppWindow = () => {
 
 const openEphemeral = (url) => {
   const args = [
-    `--url2=${url}`
+    `--url=${url}`,
+    `--ephemeral`
   ];
 
   // spawn a new process to open the URL
   openSelf(args);
-
-  // exit this process
-  // TODO: make option, eg if a passthru cli call or whatever
-  //app.quit()
 };
 
-const openURL = (url) => {
-  // Validation on the front-end but give it a nod anyway
-  if (!url || !validURL(url)) {
+const openURL = (url = null, partition = null) => {
+  // Check URL
+  if (url === null || !validURL(url)) {
     const errmsg = `URL is bad`;
     console.error(errmsg);
     felo('fail', errmsg);
     return;
   }
 
-  // Create the browser window.
-  const win = new BrowserWindow({
+  let options = ({
     autoHideMenuBar: true,
     height: DEFAULT_WEB_HEIGHT,
     width: DEFAULT_WEB_WIDTH,
-    webPreferences: {
-      preload: path.join(__dirname, 'preload.js')
-    }
+    webPreferences: {}
   });
+
+  if (typeof partition === 'string' && partition.length > 0) {
+    options.webPreferences.partition = partition;
+    console.log('Using partition', partition);
+  }
+  // TODO: fail on present but bad partition var
+
+  // Create the browser window.
+  const win = new BrowserWindow(options);
 
   // and load the URL of the website.
   win.loadURL(url);
@@ -287,7 +290,7 @@ const registerAsDefaultBrowser = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  //
+  /*
   // Check for protocol URL in argv (Windows/Linux)
   const protocolUrl = process.argv.find(arg => arg.startsWith('http://') || arg.startsWith('https://'));
   if (protocolUrl && !app.commandLine.hasSwitch('url') && !app.commandLine.hasSwitch('url2')) {
@@ -295,33 +298,31 @@ app.whenReady().then(() => {
     openURL(protocolUrl);
     return;
   }
-  //
+  */
 
-  //
-  // We're initial process to open a URL
+  // Open a URL
   if (app.commandLine.hasSwitch('url')) {
-    console.log('url switch found');
-
     const url = app.commandLine.getSwitchValue('url');
-    console.log('url', url);
+    console.log('url switch found', url);
 
+    // Validate URL
     if (!validURL(url)) {
       console.error('Bad URL');
     }
     else {
-      openURL(url);
-    }
-  }
-  else
-  //
-  // We're a temporary spawn to open a URL
-  if (app.commandLine.hasSwitch('url2')) {
-    // If we're opening a temporary URL then we need to
-    // create a temporary profile for the data
-    initTempProfile();
+      // Open ephemeral profile
+      if (app.commandLine.hasSwitch('ephemeral')) {
+        // If we're opening as temporary app then
+        // create a temporary profile
+        initTempProfile();
+      }
 
-    const url = app.commandLine.getSwitchValue('url2');
-    openURL(url);
+      let partition = app.commandLine.hasSwitch('partition') ?
+        app.commandLine.getSwitchValue('partition') : null;
+      console.log('partition', partition);
+
+      openURL(url, partition);
+    }
   }
   // Default app window
   else {
@@ -335,6 +336,7 @@ app.whenReady().then(() => {
   }
 });
 
+// TODO: figure out param handling here...
 app.on('open-url', (event, url) => {
   // TODO: test if this is needed
   //event.preventDefault();

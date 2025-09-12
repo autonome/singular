@@ -11,6 +11,29 @@ alternative ways to use the web which go beyond what contemporary browsers do.
 
 <img src="singular-open-url.gif">
 
+## Opening URLs
+
+
+Singular can open URLs for you in single undecorated windows.
+
+Usage:
+
+- Open the app
+- Enter a URL
+- Click 'Open URL'
+
+Singular can also open URLs from the command line, or as system default handler.
+
+Options:
+- `url`: The URL to open
+- `partition`: A string indicating the name of a [session](https://www.electronjs.org/docs/latest/api/structures/web-preferences) to open the URL in
+- `ephemeral`: Open the URL in a temporary app process with a temporary browser profile written only to the system tmp directory
+
+Notes:
+- `ephemeral` is not private browsing! It does not remove the profile directory after the application closes
+- Specifying a `partition` while also setting `ephemeral` will write your partition to a temp profile, so is a no-op basically
+
+
 ## Ephemeral web apps
 
 Browsers are cognitively and emotionally heavy in so many ways - tabs, windows, product branding, company branding, "browser wars", extensions, history and link coloring, ads, surveillance and tracking, desktop vs mobile, sync, accounts, cookies, sessions...
