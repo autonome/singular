@@ -282,7 +282,7 @@ const registerAsDefaultBrowser = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  /*
+  //
   // Check for protocol URL in argv (Windows/Linux)
   const protocolUrl = process.argv.find(arg => arg.startsWith('http://') || arg.startsWith('https://'));
   if (protocolUrl && !app.commandLine.hasSwitch('url') && !app.commandLine.hasSwitch('url2')) {
@@ -290,9 +290,9 @@ app.whenReady().then(() => {
     openURL(protocolUrl);
     return;
   }
-  */
+  //
 
-  /*
+  //
   // We're initial process to open a URL
   if (app.commandLine.hasSwitch('url')) {
     console.log('url switch found');
@@ -308,7 +308,7 @@ app.whenReady().then(() => {
     }
   }
   else
-  */
+  //
   // We're a temporary spawn to open a URL
   if (app.commandLine.hasSwitch('url2')) {
     // If we're opening a temporary URL then we need to

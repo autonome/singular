@@ -9,7 +9,7 @@ It has two modes:
 WARNING: This is not production software yet, just scratching an itch and exploring
 alternative ways to use the web which go beyond what contemporary browsers do.
 
-<img src="screenshot.png">
+<img src="singular-open-url.gif">
 
 ## Ephemeral web apps
 
