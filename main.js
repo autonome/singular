@@ -21,25 +21,20 @@ process.noAsar = true;
 
 const __dirname = import.meta.dirname
 
-/*
+// Variable set when there's a URL to open and the
+// request came in before the application is ready.
+let deepLinkURL = null;
+
 // if spawned copy for url opening, log to file so we can debug
-if (app.commandLine.hasSwitch('url2')) {
-  const tempDir = app.getPath('temp');
-  const access = fs.createWriteStream(path.join(tempDir, 'singular.log'));
-  process.stdout.write = process.stderr.write = access.write.bind(access);
-}
+/*
+const tempDir = '/tmp'; //app.getPath('temp');
+const access = fs.createWriteStream(path.join(tempDir, 'singular.log'));
+process.stdout.write = process.stderr.write = access.write.bind(access);
 */
 
 process.on('uncaughtException', function(err) {
   console.error((err && err.stack) ? err.stack : err);
 });
-
-// fs logger
-const logfile = '/tmp/singular-log.txt';
-const fslo = (...args) => {
-  console.log('fslo', ...args);
-  fs.appendFileSync(logfile, args.toString() + '\n');
-};
 
 // front-end logger
 const felo = (type, text) => {
@@ -104,7 +99,6 @@ const openURL = (url = null, partition = null) => {
 
   if (typeof partition === 'string' && partition.length > 0) {
     options.webPreferences.partition = partition;
-    console.log('Using partition', partition);
   }
   // TODO: fail on present but bad partition var
 
@@ -118,7 +112,6 @@ const openURL = (url = null, partition = null) => {
 // Generate app package, zip it, and trigger download
 const generate = async opts => {
   const { name, url } = opts;
-  console.log('generating', name, url);
 
   // Validation on the front-end but give it a nod anyway
   if (!name || name.length < 2 || !url || !validURL(url)) {
@@ -237,7 +230,6 @@ const getAppPath = () => {
 const openSelf = (addlArgs = []) => {
   // running in dev or prod
   const isPackaged = app.isPackaged;
-  console.log('isPackaged', isPackaged);
 
   let cmd = 'electron-forge';
   if (isPackaged) {
@@ -245,8 +237,6 @@ const openSelf = (addlArgs = []) => {
     const appPath = getAppPath();
     cmd = appPath;
   }
-
-  console.log('cmd', cmd);
 
   const args = [
     'start',
@@ -267,8 +257,6 @@ const openSelf = (addlArgs = []) => {
   }).on('spawn', () => {
     // unref the process so we are decoupled
     p2.unref();
-    // TODO: should send this to front-end
-    console.log('spawn complete');
   });
 };
 
@@ -304,6 +292,12 @@ const registerAsDefaultBrowser = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
+  // If there's a deep link URL to open then do that now and bounce
+  if (deepLinkURL !== null && validURL(deepLinkURL)) {
+    openURL(deepLinkURL);
+    deepLinkURL = null;
+    return;
+  }
 
   // Check for protocol URL in argv, to open from other apps
   // Confirmed in macOS
@@ -330,9 +324,8 @@ app.whenReady().then(() => {
         initTempProfile();
       }
 
-      let partition = app.commandLine.hasSwitch('partition') ?
+      const partition = app.commandLine.hasSwitch('partition') ?
         app.commandLine.getSwitchValue('partition') : null;
-      console.log('partition', partition);
 
       openURL(url, partition);
     }
@@ -345,7 +338,9 @@ app.whenReady().then(() => {
     app.on('activate', function () {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
-      if (BrowserWindow.getAllWindows().length === 0) createAppWindow()
+      if (BrowserWindow.getAllWindows().length === 0) {
+        createAppWindow();
+      }
     });
   }
 });
@@ -360,10 +355,18 @@ const closeAppWindow = () => {
 
 // Handle opening URLs from other apps
 app.on('open-url', (e, url) => {
-  e.preventDefault();
-  // TODO: race happening, should figure this bit out
-  closeAppWindow();
-  openURL(url);
+  if (!validURL(url)) {
+    console.error('Bad URL');
+    return;
+  }
+
+  if (app.isReady()) {
+      openURL(url);
+  }
+  // Handled later when app is ready
+  else {
+    deepLinkURL = url;
+  }
 });
 
 ipcMain.on('open', (e, msg) => openURL(msg.url));
