@@ -8,7 +8,8 @@
     "rawstart": "electron .",
     "start": "electron-forge start",
     "package": "electron-forge package",
-    "tmp-linux-start": "yarn package && ./out/Singular-linux-arm64/Singular --no-sandbox",
+    "linux-start": "./out/Singular-linux-arm64/Singular --no-sandbox",
+    "macos-start": "./out/Singular-darwin-arm64/Singular.app/Contents/MacOS/Singular",
     "make": "electron-forge make"
   },
   "repository": "https://github.com/autonome/singular",

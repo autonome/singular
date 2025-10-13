@@ -34,10 +34,19 @@ process.on('uncaughtException', function(err) {
   console.error((err && err.stack) ? err.stack : err);
 });
 
+// fs logger
+const logfile = '/tmp/singular-log.txt';
+const fslo = (...args) => {
+  console.log('fslo', ...args);
+  fs.appendFileSync(logfile, args.toString() + '\n');
+};
+
 // front-end logger
-const felo = (type, text) =>
+const felo = (type, text) => {
+  console.log(type, text);
   BrowserWindow.getAllWindows()[0]
-    .webContents.send(type, text );
+    .webContents.send(type, text);
+};
 
 const validURL = str => {
   try {
@@ -85,6 +94,11 @@ const openURL = (url = null, partition = null) => {
     autoHideMenuBar: true,
     height: DEFAULT_WEB_HEIGHT,
     width: DEFAULT_WEB_WIDTH,
+    /*
+    skipTaskbar: true,
+    frame: false,
+    backgroundColor: 'transparent',
+    */
     webPreferences: {}
   });
 
@@ -290,20 +304,19 @@ const registerAsDefaultBrowser = () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
-  /*
-  // Check for protocol URL in argv (Windows/Linux)
-  const protocolUrl = process.argv.find(arg => arg.startsWith('http://') || arg.startsWith('https://'));
-  if (protocolUrl && !app.commandLine.hasSwitch('url') && !app.commandLine.hasSwitch('url2')) {
-    console.log('Found protocol URL in argv:', protocolUrl);
-    openURL(protocolUrl);
-    return;
-  }
-  */
 
-  // Open a URL
-  if (app.commandLine.hasSwitch('url')) {
+  // Check for protocol URL in argv, to open from other apps
+  // Confirmed in macOS
+  // Needs testing in Windows/Linux
+  const protocolUrl = process.argv.find(
+    arg => arg.startsWith('http://') || arg.startsWith('https://'));
+  if (protocolUrl && !app.commandLine.hasSwitch('url') && !app.commandLine.hasSwitch('url2')) {
+    openURL(protocolUrl);
+  }
+
+  // Open a URL from command line parameter `url`
+  else if (app.commandLine.hasSwitch('url')) {
     const url = app.commandLine.getSwitchValue('url');
-    console.log('url switch found', url);
 
     // Validate URL
     if (!validURL(url)) {
@@ -324,6 +337,7 @@ app.whenReady().then(() => {
       openURL(url, partition);
     }
   }
+
   // Default app window
   else {
     createAppWindow();
@@ -336,10 +350,19 @@ app.whenReady().then(() => {
   }
 });
 
-// TODO: figure out param handling here...
-app.on('open-url', (event, url) => {
-  // TODO: test if this is needed
-  //event.preventDefault();
+// Close the main app window
+const closeAppWindow = () => {
+  const allWindows = BrowserWindow.getAllWindows();
+  if (allWindows.length > 0) {
+    allWindows[0].close();
+  }
+};
+
+// Handle opening URLs from other apps
+app.on('open-url', (e, url) => {
+  e.preventDefault();
+  // TODO: race happening, should figure this bit out
+  closeAppWindow();
   openURL(url);
 });
 
