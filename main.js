@@ -89,10 +89,19 @@ const openURL = (url = null, partition = null) => {
     autoHideMenuBar: true,
     height: DEFAULT_WEB_HEIGHT,
     width: DEFAULT_WEB_WIDTH,
+
     /*
+    // TODO: figure out a way to do borderless windows in Singular flow
+    // probably by implementing titlebar show on hover
     skipTaskbar: true,
     frame: false,
     backgroundColor: 'transparent',
+    */
+
+    /*
+    // TODO: figure out a way to do transient windows in Singular flow
+    modal: true,
+    type: 'panel',
     */
     webPreferences: {}
   });
